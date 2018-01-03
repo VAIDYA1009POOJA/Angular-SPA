@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="test">
+<head>
+    <title>Employee</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Angular -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <!-- Angular Route -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
+</head>
+    
+    <body id="styling">
+    <div  >
+        
+         <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Employee Website</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="#">Home</a></li>
+      <li><a href="#!employee_page">Employee</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+    </ul>
+  </div>
+</nav>
+     
+        
+        <div ng-view></div>
+        
+        <img src="images.jpg"> 
+    </div>
+       
+        <script>
+        var myApp = angular.module("test",["ngRoute"]);
+            myApp.config(function($routeProvider){
+                $routeProvider.when("/employee_page",{
+                    templateUrl : "employee_page.html",
+                    controller: "emp_ctrl",
+                })
+                .when("/newemployee" ,{
+                    templateUrl : "newemployee.html" ,
+                    controller : "newemp_ctrl"
+                });
+            });
+            myApp.service('service_one',function($http){
+                this.getData = function(){ 
+                    return $http.get("MOCK_DATA.json");}; 
+                this.data;
+                this.i ;
+                this.editData;
+                
+            });
+            myApp.controller("emp_ctrl", function($scope,service_one,$location){
+              
+                
+                
+               if(!service_one.data){
+                service_one.getData().then(function(result){
+                    service_one.data=result.data;
+                   $scope.myData = service_one.data;
+               });
+               
+               }
+                else{
+                    $scope.myData = service_one.data;
+                }
+                
+               $scope.newpage = function(){
+                   
+                  $location.path("/newemployee");
+                   $scope.user = {};
+               }; 
+                $scope.edit = function(index){
+                    
+                    service_one.i = index ;
+                    service_one.editData = service_one.data[service_one.i];
+                    console.log(service_one.editData);
+                     $scope.user = service_one.editData ;
+                    console.log($scope.user);
+                     
+console.log($scope.user);
+                     $location.path("/newemployee");
+                    
+                };
+                $scope.remove = function(index){
+                    $scope.myData.splice(index,1);
+                };
+            });
+            
+           myApp.controller("newemp_ctrl" , function($scope,service_one,$location){
+                     
+               $scope.cancle = function(){
+                    $location.path("/employee_page");
+               }
+               
+               $scope.user = service_one.editData ;
+               
+              $scope.submit = function(){
+                  if(!service_one.editData)
+                  {
+                       $location.path("/employee_page");
+                     service_one.data.push($scope.user);
+                      
+                  }else
+                  {
+                      service_one.data[service_one.i] = $scope.user ;
+                       
+                    $location.path("/employee_page"); 
+                    
+                
+                  }
+                 
+              }
+         });
+        </script>
+    </body>
+    
+</html>
